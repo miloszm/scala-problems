@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 
 
 /**
-  * 4.7 Test
+  * 4.6 Test
   */
 class BinarySearchNodeSuccessorTest extends FunSpec with Matchers with Inside {
 
