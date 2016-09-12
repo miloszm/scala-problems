@@ -7,21 +7,32 @@ object LongestIncreasingSubsequenceFinder {
 
   case class HtWt(ht:Int, wt:Int) extends Ordered[HtWt]{
     override def compare(that: HtWt): Int = {
-      if (ht != that.ht) ht.compare(that.ht) else wt.compare(that.wt)
+      wt.compare(that.wt)
     }
-    def isBefore(other:HtWt):Boolean = ht < other.ht && wt < other.wt
   }
 
-  def longestIncreasingSubsequence(array:List[HtWt]):List[HtWt] = {
-    val arraySorted = array.sorted
-    var solutions:List[List[HtWt]] = List()
-    for (currentElement <- arraySorted){
-      val bestSequenceCandidates = solutions.filter(_.last.isBefore(currentElement))
-      val bestSequence:List[HtWt] = if (bestSequenceCandidates.isEmpty) List() else bestSequenceCandidates.maxBy(_.length)
-      val newSolutions = (currentElement :: bestSequence) :: solutions
-      solutions = newSolutions
-    }
-    solutions.maxBy(_.length)
+  /**
+    * For two dimensional problem we sort on one dimension (height)
+    * and then we search longest increasing subsequence on the other dimension (weight).
+    */
+  def longestIncreasingSubsequenceSorted(array: List[HtWt]): List[HtWt] = {
+    longestIncreasingSubsequence(array.sortBy(_.ht))
   }
 
+  def longestIncreasingSubsequence[T:Ordering](array: List[T])(implicit ord:Ordering[T]): List[T] = {
+    def mx(a:List[T],b:List[T]):List[T] = if (a.length > b.length) a else b
+    def go(a: List[T], cur: List[T], prev: List[T]): List[T] = {
+      a match {
+        case Nil => mx(cur,prev).reverse
+        case h :: t =>
+          if (cur.isEmpty || ord.gt(h,cur.head)) {
+            go(t, h :: cur, prev)
+          }
+          else {
+            go(t, List(h), mx(cur,prev))
+          }
+      }
+    }
+    go(array, List(), List())
+  }
 }
